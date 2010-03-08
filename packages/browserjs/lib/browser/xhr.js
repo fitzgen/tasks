@@ -1,19 +1,21 @@
 var File = require("file"),
-    IO = require("io").IO,
-    URI = require("uri"),
-    HashP = require("hashp").HashP,
-    ByteString = require("binary").ByteString,
-    DOMParser = require("./dom").DOMParser;
+        IO = require("io").IO,
+        URI = require("uri"),
+        HashP = require("hashp").HashP,
+        ByteString = require("binary").ByteString,
+        ByteArray = require("binary").ByteArray,
+        DOMParser = require("./dom").DOMParser,
+        enqueue = require("event-queue").enqueue;
 
 // http://www.w3.org/TR/XMLHttpRequest/
 
 var parser = new DOMParser();
 
 var UNSENT = 0,
-    OPENED = 1,
-    HEADERS_RECEIVED = 2,
-    LOADING = 3,
-    DONE = 4;
+        OPENED = 1,
+        HEADERS_RECEIVED = 2,
+        LOADING = 3,
+        DONE = 4;
 
 var XMLHttpRequest = exports.XMLHttpRequest = function()
 {
@@ -81,7 +83,7 @@ XMLHttpRequest.prototype.open = function(method, url, async, user, password)
 
     var uri = URI.parse(url);
 
-    if (!uri.scheme)
+    if (uri.scheme === null)
         uri.scheme = "file";
 
     // 5. Drop the fragment identifier (if any) from url and let stored url be the result of that operation.
@@ -130,7 +132,7 @@ XMLHttpRequest.prototype.open = function(method, url, async, user, password)
     if (password !== undefined)
         this._password = password;
 
-    this._url = uri.toString();
+    this._url = url.toString();
 
     // 19. Abort the send() algorithm, set response entity body to "null" and reset the list of request headers.
     this._requestHeaders = {};
@@ -207,130 +209,171 @@ var initSend = function(data){
 }
 
 function sendData(entityBody){
-        // 5. Make a request to stored url, using HTTP method stored method, user stored user (if provided) and password stored password (if provided), taking into account the entity body, list of request headers and the rules listed directly after this set of steps.
+    // 5. Make a request to stored url, using HTTP method stored method, user stored user (if provided) and password stored password (if provided), taking into account the entity body, list of request headers and the rules listed directly after this set of steps.
     // 6. Synchronously dispatch a readystatechange event on the object.
-    if (this.onreadystatechange)
-        this.onreadystatechange();
+    var self = this;
 
-    try {
-        var uri = URI.parse(this._url);
-        if (!uri.scheme || uri.scheme == "file") {
-            // unclear whether plusses are reserved in the URI path
-            //uri.path = decodeURIComponent(uri.path.replace(/\+/g, " "));
-            if (this._method === "PUT") {
-                if ((File.exists(uri.path) && File.isWritable(uri.path)) || File.path(uri.path).resolve('..').isWritable()) {
-                    this.output = File.write(uri.path, entityBody || new ByteString(), { mode : "b" });
-                    this.status = 201;
-                } else {
-                    this.status = 403;
-                }
-            } else if (this._method === "DELETE") {
-                if (File.exists(uri.path)) {
-                    if (File.path(uri.path).resolve('..').isWritable()) {
-                        File.remove(uri.path);
-                        this.status = 200;
-                    } else {
-                        this.status = 403;
-                    }
-                } else {
-                    this.status = 404;
-                }
-            } else {
-                if (File.exists(uri.path)) {
-                    this.responseText = File.read(uri.path, { charset : "UTF-8" }); // FIXME: don't assume UTF-8?
-                    this.status = 200;
-                } else {
-                    this.status = 404;
-                }
-            }
+    if (this.onreadystatechange) {
+        if (this._async) {
+            enqueue(function() { self.onreadystatechange(); });
         } else {
-            var url = new java.net.URL(this._url),
-                connection = url.openConnection();
-
-            connection.setDoInput(true);
-
-            connection.setRequestMethod(this._method);
-
-            for (var header in this._requestHeaders) {
-                var value = this._requestHeaders[header];
-                connection.addRequestProperty(String(header), String(value));
-            }
-
-            var input = null;
-            try {
-                if (entityBody) {
-                    connection.setDoOutput(true);
-
-                    var output = new IO(null, connection.getOutputStream());
-                    output.write(entityBody);
-                    output.close();
-                }
-                connection.connect();
-
-                input = new IO(connection.getInputStream(), null);
-            } catch (e) {
-                // HttpUrlConnection will throw FileNotFoundException on 404 errors. FIXME: others?
-                if (e.javaException instanceof java.io.FileNotFoundException)
-                    input = new IO(connection.getErrorStream(), null);
-                else {
-                    try {
-                        this.status = Number(connection.getResponseCode());
-                        this.statusText = String(connection.getResponseMessage());
-                        return;
-                    } catch (err) {
-                        throw e;
-                    }
-                }
-            }
-
-            this.status = Number(connection.getResponseCode());
-            this.statusText = String(connection.getResponseMessage() || "");
-
-            for (var i = 0;; i++) {
-                var key = connection.getHeaderFieldKey(i),
-                    value = connection.getHeaderField(i);
-                if (!key && !value)
-                    break;
-                // returns the HTTP status code with no key, ignore it.
-                if (key)
-                    this._responseHeaders[String(key)] = String(value);
-            }
-
-            //this.readyState = HEADERS_RECEIVED;
-            //this.readyState = LOADING;
-
-            this.responseRaw = input.read();
-            this.responseText = this.responseRaw.decodeToString("UTF-8"); // FIXME: don't assume UTF-8?
+            self.onreadystatechange();
         }
-        system.log.debug("xhr response:  " + this._url + " (status="+this.status+" length="+this.responseText.length+")");
-    }
-    catch (e) {
-        this.status = 500;
-        this.responseText = "";
-        system.log.warn("xhr exception: " + this.url + " ("+e+")");
-    }
-
-    this.responseXML = null;
-    if (this.responseText)
-    {
-        var contentType = HashP.includes(this._responseHeaders, "Content-Type") ? HashP.get(this._responseHeaders, "Content-Type") : "text/xml";
-
-        if (contentType.match(/((^text\/xml$)|(^application\/xml$)|(\+xml$))/))
-        try { this.responseXML = parser.parseFromString(this.responseText, contentType); } catch (e) {}
     }
     
-    // 7. If async is true return the send() method call. (Do not terminate the steps in the algorithm though.)
-    // 8. While downloading the resource the following rules are to be observed.
-    // 9. When the request has successfully completed loading, synchronously switch the state to DONE and then synchronously dispatch a readystatechange event on the object and return the method call in case of async being false.
+    var sendDataHelper = {
+        run: function() {
+            try {
+                var uri = URI.parse(self._url);
+                if (uri.scheme == null || uri.scheme == "file") {
+                    // unclear whether plusses are reserved in the URI path
+                    //uri.path = decodeURIComponent(uri.path.replace(/\+/g, " "));
+                    if (self._method === "PUT") {
+                        if ((File.exists(uri.path) && File.isWritable(uri.path)) || File.path(uri.path).resolve('..').isWritable()) {
+                            self.output = File.write(uri.path, entityBody || new ByteString(), { mode : "b" });
+                            self.status = 201;
+                        } else {
+                            self.status = 403;
+                        }
+                    } else if (self._method === "DELETE") {
+                        if (File.exists(uri.path)) {
+                            if (File.path(uri.path).resolve('..').isWritable()) {
+                                File.remove(uri.path);
+                                self.status = 200;
+                            } else {
+                                self.status = 403;
+                            }
+                        } else {
+                            self.status = 404;
+                        }
+                    } else {
+                        if (File.exists(uri.path)) {
+                            self.responseText = File.read(uri.path, { charset : "UTF-8" }); // FIXME: don't assume UTF-8?
+                            self.status = 200;
+                        } else {
+                            self.status = 404;
+                        }
+                    }
+                } else {
+                    var url = new java.net.URL(self._url),
+                            connection = url.openConnection();
 
-    // FIXME: this is very very wrong. hook into event loop correctly
-    this.readyState = DONE;
-    if (this.onreadystatechange) {
-        var that = this;
-        if (this._async)
-            require("./timeout").setTimeout(function() { that.onreadystatechange() }, 0); // FIXME
-        else
-            this.onreadystatechange();
+                    connection.setDoInput(true);
+
+                    connection.setRequestMethod(self._method);
+
+                    for (var header in self._requestHeaders) {
+                        var value = self._requestHeaders[header];
+                        connection.addRequestProperty(String(header), String(value));
+                    }
+
+                    var input = null;
+                    var inputStream = null;
+                    var inputStreamReader = null;
+                    try {
+                        if (entityBody) {
+                            connection.setDoOutput(true);
+
+                            var output = new IO(null, connection.getOutputStream());
+                            output.write(entityBody);
+                            output.close();
+                        }
+                        connection.connect();
+
+                        inputStream = connection.getInputStream();
+                        inputStreamReader = new Packages.java.io.BufferedReader(new Packages.java.io.InputStreamReader(inputStream));
+                        //                input = new IO(inputStream, null);
+                    } catch (e) {
+                        // HttpUrlConnection will throw FileNotFoundException on 404 errors. FIXME: others?
+                        if (e.javaException instanceof java.io.FileNotFoundException)
+                            input = new IO(connection.getErrorStream(), null);
+                        else {
+                            try {
+                                self.status = Number(connection.getResponseCode());
+                                self.statusText = String(connection.getResponseMessage());
+                                return;
+                            } catch (err) {
+                                throw e;
+                            }
+                        }
+                    }
+
+                    self.status = Number(connection.getResponseCode());
+                    self.statusText = String(connection.getResponseMessage() || "");
+
+                    for (var i = 0;; i++) {
+                        var key = connection.getHeaderFieldKey(i),
+                                value = connection.getHeaderField(i);
+                        if (!key && !value)
+                            break;
+                        // returns the HTTP status code with no key, ignore it.
+                        if (key)
+                            self._responseHeaders[String(key)] = String(value);
+                    }
+
+                    //this.readyState = HEADERS_RECEIVED;
+                    self.readyState = LOADING;
+                    if (self._async) {
+                        enqueue(function() {
+                            if (self.onreadystatechange) { self.onreadystatechange(); }
+                        });
+                    } else {
+                        if (self.onreadystatechange) { self.onreadystatechange(); }
+                    }
+
+                    var input = new IO(inputStream, null);
+
+                    if (self._async) {
+                        self.responseRaw = new ByteArray;
+                        readStreamHelper(input, function(bytes) {
+                            enqueue(function() {
+                                self.responseRaw = self.responseRaw.concat(bytes);
+                                self.responseText = self.responseRaw.decodeToString("UTF-8"); // Should we assume UTF-8?
+
+                                if (self.onreadystatechange)
+                                    self.onreadystatechange();
+                            });
+                        });
+                    } else {
+                        self.responseRaw = input.read();
+                        self.responseText = self.responseRaw.decodeToString("UTF-8");
+                    }
+                }
+                system.log.debug("xhr response:  " + self._url + " (status="+self.status+" length="+self.responseText.length+")");
+            }
+            catch (e) {
+                self.status = 500;
+                self.responseText = "";
+                system.log.warn("xhr exception: " + self.url + " ("+e+")");
+            }
+
+            self.responseXML = null;
+            if (self.responseText && (!HashP.includes(self._responseHeaders, "Content-Type") || HashP.get(self._responseHeaders, "Content-Type").match(/((^text\/xml$)|(^application\/xml$)|(\+xml$))/)))
+                try { self.responseXML = parser.parseFromString(self.responseText); } catch (e) {}
+
+            // 7. If async is true return the send() method call. (Do not terminate the steps in the algorithm though.)
+            // 8. While downloading the resource the following rules are to be observed.
+            // 9. When the request has successfully completed loading, synchronously switch the state to DONE and then synchronously dispatch a readystatechange event on the object and return the method call in case of async being false.
+
+            // FIXME: this is very very wrong
+            self.readyState = DONE;
+            if (self.onreadystatechange) {
+                if (self._async)
+                    enqueue(function() {
+                        self.onreadystatechange();
+                    });
+                else
+                    self.onreadystatechange();
+            }
+        }
+    };
+
+    if (this._async) {
+        var r = new java.lang.Runnable(sendDataHelper);
+        var t = new java.lang.Thread(r);
+        t.start();
+    } else {
+        sendDataHelper.run();
     }
 }
 
@@ -369,9 +412,9 @@ XMLHttpRequest.prototype.send = function(data)
             values[0] = values[0].replace(/(;\s*charset=([^;]+|.*$)|$)/, "; charset=utf-8");
     }
     //else if (data instanceof Document) {
-        // data is a Document
-        // Serialize data into a namespace well-formed XML document and encoded using the encoding given by data.inputEncoding, when not null, or UTF-8 otherwise. Or, if this fails because the Document cannot be serialized act as if data is null.
-        // If no Content-Type header has been set using setRequestHeader() append a Content-Type header to the list of request headers with a value of application/xml;charset=charset where charset is the encoding used to encode the document.
+    // data is a Document
+    // Serialize data into a namespace well-formed XML document and encoded using the encoding given by data.inputEncoding, when not null, or UTF-8 otherwise. Or, if this fails because the Document cannot be serialized act as if data is null.
+    // If no Content-Type header has been set using setRequestHeader() append a Content-Type header to the list of request headers with a value of application/xml;charset=charset where charset is the encoding used to encode the document.
     //}
     else {
         // data is not a DOMString or Document
@@ -449,3 +492,11 @@ XMLHttpRequest.prototype.getResponseHeader = function(header)
     return HashP.get(this._responseHeaders, header) || null;
 }
 
+function readStreamHelper(inputStream, progressCallback, chunkSize) {
+    var buf;
+    if (chunkSize === undefined) chunkSize = 4096;
+    while (buf = inputStream.read(chunkSize)) {
+        progressCallback(buf);
+        if (buf.length === 0) break;
+    }
+}
