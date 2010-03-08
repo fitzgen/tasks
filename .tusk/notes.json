@@ -97,5 +97,15 @@
         ],
         "requester": "module",
         "finished": true
+    },
+    "observable": {
+        "requester": "user",
+        "files": [
+            "/home/fitzgen/Documents/tasks/packages/observable/README.md",
+            "/home/fitzgen/Documents/tasks/packages/observable/examples/person.js",
+            "/home/fitzgen/Documents/tasks/packages/observable/lib/observable.js",
+            "/home/fitzgen/Documents/tasks/packages/observable/package.json"
+        ],
+        "finished": true
     }
 }
