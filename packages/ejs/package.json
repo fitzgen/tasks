@@ -1,0 +1,10 @@
+{
+    "name": "ejs",
+    "description": "Embedded JavaScript templating framework",
+    "keywords": ["erb", "ejs", "template"],
+    "author": "",
+    "email": "",
+    "dependencies": [],
+    "lib": "lib"
+}
+

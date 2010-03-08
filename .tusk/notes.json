@@ -1,0 +1,101 @@
+{
+    "bogart": {
+        "requester": "user",
+        "files": [
+            "/home/fitzgen/Documents/tasks/packages/bogart/README.md",
+            "/home/fitzgen/Documents/tasks/packages/bogart/lib/bogart.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/lib/bogart/plugin/all.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/lib/bogart/plugin/balance_static_files.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/lib/bogart/plugin/ejs.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/lib/bogart/plugin/ejs/ejs_layout_renderer.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/lib/bogart/plugin/publish_events.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/lib/bogart/support/loader_base.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/lib/bogart/support/router_loader.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/log/development",
+            "/home/fitzgen/Documents/tasks/packages/bogart/log/development.log",
+            "/home/fitzgen/Documents/tasks/packages/bogart/package.json",
+            "/home/fitzgen/Documents/tasks/packages/bogart/packages/bogart-log/lib/bogart-log.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/packages/bogart-log/package.json",
+            "/home/fitzgen/Documents/tasks/packages/bogart/packages/bogart-log/tests/log.tests.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/packages/bogart-log/tests/log/all-tests.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/packages/bogart-log/tests/log/test.log",
+            "/home/fitzgen/Documents/tasks/packages/bogart/packages/inflector/lib/inflector.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/packages/inflector/package.json",
+            "/home/fitzgen/Documents/tasks/packages/bogart/tests/bogart.tests.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/tests/bogart/all-tests.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/tests/bogart/app-tests.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/tests/bogart/dsl-tests.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/tests/bogart/ejs-tests.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/tests/bogart/observable/observable_tests.js",
+            "/home/fitzgen/Documents/tasks/packages/bogart/tests/views/index.html.json"
+        ],
+        "finished": true
+    },
+    "ejs": {
+        "files": [
+            "/home/fitzgen/Documents/tasks/packages/ejs/README.md",
+            "/home/fitzgen/Documents/tasks/packages/ejs/lib/ejs.js",
+            "/home/fitzgen/Documents/tasks/packages/ejs/package.json",
+            "/home/fitzgen/Documents/tasks/packages/ejs/tests/ejs.tests.js",
+            "/home/fitzgen/Documents/tasks/packages/ejs/tests/ejs/select_tag_tests.js"
+        ],
+        "requester": "module",
+        "finished": true
+    },
+    "couchdb": {
+        "requester": "user",
+        "files": [
+            "/home/fitzgen/Documents/tasks/packages/couchdb/README.md",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/.svn/entries",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/.svn/format",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/.svn/text-base/couchdb.js.svn-base",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/.svn/text-base/database.js.svn-base",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/.svn/text-base/design_document.js.svn-base",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/.svn/text-base/env.rhino.js.svn-base",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/.svn/text-base/http_client.js.svn-base",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/.svn/text-base/jquery-1.3.2.js.svn-base",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/.svn/text-base/test.html.svn-base",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/couchdb.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/couchdb/database.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/couchdb/design_document.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/lib/couchdb/http_client.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/package.json",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/.svn/entries",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/.svn/format",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/assets/tabby.jpg",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/couchdb.tests.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/couchdb/.svn/entries",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/couchdb/.svn/format",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/couchdb/all-tests.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/couchdb/attachment_tests.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/couchdb/database.tests.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/couchdb/database/all-tests.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/couchdb/database/database-with-one-doc.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/couchdb/database/database-with-slash-in-name.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/couchdb/database/empty-database-tests.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/couchdb/design_document_tests.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/couchdb/server.tests.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/test-config.js",
+            "/home/fitzgen/Documents/tasks/packages/couchdb/tests/test_helper.js"
+        ],
+        "finished": true
+    },
+    "browserjs": {
+        "files": [
+            "/home/fitzgen/Documents/tasks/packages/browserjs/README.md",
+            "/home/fitzgen/Documents/tasks/packages/browserjs/engines/jsc/lib/browser/dom.js",
+            "/home/fitzgen/Documents/tasks/packages/browserjs/engines/rhino/lib/browser/dom.js",
+            "/home/fitzgen/Documents/tasks/packages/browserjs/lib/browser.js",
+            "/home/fitzgen/Documents/tasks/packages/browserjs/lib/browser/canvas.js",
+            "/home/fitzgen/Documents/tasks/packages/browserjs/lib/browser/console.js",
+            "/home/fitzgen/Documents/tasks/packages/browserjs/lib/browser/timeout.js",
+            "/home/fitzgen/Documents/tasks/packages/browserjs/lib/browser/window.js",
+            "/home/fitzgen/Documents/tasks/packages/browserjs/lib/browser/xhr.js",
+            "/home/fitzgen/Documents/tasks/packages/browserjs/package.json",
+            "/home/fitzgen/Documents/tasks/packages/browserjs/test/browserjs-tests.js",
+            "/home/fitzgen/Documents/tasks/packages/browserjs/test/xhr-tests.js"
+        ],
+        "requester": "module",
+        "finished": true
+    }
+}
