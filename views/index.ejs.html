@@ -7,7 +7,10 @@
     <h2>TODO</h2>
     <ul>
       <% for (i = 0; i < tasks.length; i++) { %>
-         <li><%= tasks[i].task %></li>
+         <li>
+           <%= tasks[i].task %>
+           <a href="?completed=<%= tasks[i]._id %>">Mark Complete</a>
+         </li>
       <% } %>
 
       <form method="POST">
