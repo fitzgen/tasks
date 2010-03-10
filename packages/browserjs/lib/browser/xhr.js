@@ -97,7 +97,7 @@ XMLHttpRequest.prototype.open = function(method, url, async, user, password)
 
     // 7. If stored url contains an unsupported scheme raise a NOT_SUPPORTED_ERR and terminate these steps.
     if (!(/https?|file/).test(uri.scheme))
-        throw new Error("NOT_SUPPORTED_ERR");
+        throw new Error("NOT_SUPPORTED_ERR: " + uri.scheme);
 
     // 8. If the "user:password" format in the userinfo production defined in section 3.2.1 of RFC 3986 is not supported for the relevant scheme and stored url contains this format raise a SYNTAX_ERR and terminate these steps. [RFC3986]
     // 9. If stored url contains the "user:password" format let stored user be the user part and stored password be the password part.
