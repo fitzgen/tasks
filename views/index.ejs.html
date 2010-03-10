@@ -9,6 +9,10 @@
       <% for (i = 0; i < tasks.length; i++) { %>
          <li><%= tasks[i].task %></li>
       <% } %>
+
+      <form method="POST">
+        <%= form.toHtml("div") %>
+      </form>
     </ul>
   </body>
 </html>
